@@ -33,7 +33,6 @@ public class SpeedtestClient {
 	      } catch (Exception e) {
 	        System.err.println(e);
 	      }
-
+ 
 	}
-
 }
