@@ -1,2 +1,8 @@
 # Project exclude paths
 /out/
+/bin/
+/target/
+.classpath
+.gitignore
+.project
+.settings/
