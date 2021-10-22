@@ -1,28 +1,23 @@
 package LoggingService;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 public class SyslogClient {
 
-	private static int version = 1;
+	private static int VERSION = 1;
 	
-	private static final String HOST = "localhost";
+	private static final String HOST = getFQDN();
 	
-	private static String appName = SyslogClient.class.getName();
+	private static final String BOM = "BOM";
+	
+	private static final String APPNAME = SyslogClient.class.getName();
 
 	private static final int PORT = 4712;
 
@@ -30,20 +25,18 @@ public class SyslogClient {
 
 	private static final int TIMEOUT = 2000;
 	
-	private static String BOM = "BOM";
-	
 	
 	
 	private static String getFQDN() {
 		
-		String domainname = "";
+		String fqdn = "";
 		
 		try {
-			domainname = InetAddress.getLocalHost().getCanonicalHostName();
+			fqdn = InetAddress.getLocalHost().getCanonicalHostName();
 		} catch (Exception e) {
 			System.err.println("Timeout: " + e.getMessage());
 		}
-		return domainname;
+		return fqdn;
 	}
 	
 	private static String getPID() {
@@ -67,12 +60,10 @@ public class SyslogClient {
 	private static String createHeader(String facility, String severity, String msgID) {
 		
 		String pri = getPRI(facility, severity);
-
 		String timestamp = getTimeStamp();
 		String pid = getPID();
 
-		
-		return pri + version + " " + timestamp + " " + getFQDN() + " " + appName + " " + pid + " " + msgID + " ";
+		return pri + VERSION + " " + timestamp + " " + HOST + " " + APPNAME + " " + pid + " " + msgID + " ";
 	}
 	
 	private static String buildMsg(String msg) {
