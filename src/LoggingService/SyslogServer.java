@@ -15,7 +15,7 @@ public class SyslogServer {
 
 	private static final int PORT = 4712; 
 
-	private static final int BUFSIZE = 2048; //SHOULD msg length
+	private static final int BUFSIZE = 2048;
 
 
 	public static void main(String[] args) {
@@ -31,10 +31,13 @@ public class SyslogServer {
 
 				socket.receive(packetIn);
 				
+				// autodiscover handler
 				if (packetIn.getLength() == 0) {
 					ipAnswer.setSocketAddress(packetIn.getSocketAddress());
 					socket.send(ipAnswer);
-				} else {
+				} 
+				// syslog message handler
+				else {
 					System.out.println("message from " + packetIn.getAddress().getHostAddress() + ":" + packetIn.getPort());
 					System.out.println("  " + new String(packetIn.getData()));
 				}
