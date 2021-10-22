@@ -95,7 +95,6 @@ public class SyslogClient {
 		try {
 			broadcast = InetAddress.getByName("255.255.255.255");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.err.println(e);
 		}
 		return new DatagramPacket(new byte[0], 0, broadcast, PORT);
