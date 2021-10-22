@@ -45,7 +45,7 @@ public class SyslogClient {
 	}
 	
 	private static String getTimeStamp() {
-		return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(new Date());
+		return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(new Date());
 	}
 
 	private static String getPRI(String facility, String severity) {
@@ -125,11 +125,11 @@ public class SyslogClient {
 			
 			// AUTO DISCOVERY
 			socket.send(createIpRequest(PORT));
-			System.out.println("start autodiscovery..");
+			System.out.println("starting autodiscovery..");
 			
 			DatagramPacket ipAnswer = new DatagramPacket(new byte[0], 0);
 		    socket.receive(ipAnswer);
-		    System.out.println("received: " + ipAnswer.getAddress());
+		    System.out.println("  received: " + ipAnswer.getAddress());
 		    InetAddress serverAddr = ipAnswer.getAddress();
 			
 		    

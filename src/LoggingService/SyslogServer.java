@@ -22,7 +22,7 @@ public class SyslogServer {
 		
 		try (DatagramSocket socket = new DatagramSocket(PORT)) {
 			
-			System.out.println("start server..");
+			System.out.println("starting server..\n");
 			
 			DatagramPacket ipAnswer = new DatagramPacket(new byte[0], 0);			
 			DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
@@ -39,7 +39,7 @@ public class SyslogServer {
 				// syslog message handler
 				else {
 					System.out.println("message from " + packetIn.getAddress().getHostAddress() + ":" + packetIn.getPort());
-					System.out.println("  " + new String(packetIn.getData()));
+					System.out.println("  " + new String(packetIn.getData()) + "\n");
 				}
 			}
 		} catch (final IOException e) {
