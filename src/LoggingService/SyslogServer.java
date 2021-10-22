@@ -26,14 +26,11 @@ public class SyslogServer {
 		try (DatagramSocket socket = new DatagramSocket(PORT)) {
 			
 			DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
-			// kein packetOut notwendig, da keine Antwort erwartet wird
 
 			while (true) {
 				socket.receive(packetIn);
-				System.out.println(
-						"Received from: " + packetIn.getAddress().getHostAddress() + ":" + packetIn.getPort());
-				String jetzt = (new Date()).toString();
-
+				System.out.println(packetIn.getAddress().getHostAddress() + ":" + packetIn.getPort());
+				System.out.println(new String(packetIn.getData()));
 			}
 		} catch (final IOException e) {
 			System.err.println(e);
