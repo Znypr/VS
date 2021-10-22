@@ -64,7 +64,8 @@ public class SyslogClient {
     }
 	
 	private static String getPID() {
-		return ManagementFactory.getRuntimeMXBean().getName();
+		//return ManagementFactory.getRuntimeMXBean().getName();
+		return Long.toString(ProcessHandle.current().pid());
 	}
 	
 	private static String getTimeStamp() {
@@ -73,10 +74,11 @@ public class SyslogClient {
 
 	private static String getPRI(String facility, String severity) {
 
-		int fV = Integer.valueOf(facility);
-		int sV = Integer.valueOf(severity);
+		Integer fV = Integer.valueOf(facility);
+		Integer sV = Integer.valueOf(severity);
+		int pri = fV*8+sV;
 		
-		return "<" + fV*8+sV + ">";
+		return "<" + pri + ">";
 	}
 
 	private static String createHeader(String facility, String severity, String msgID) {

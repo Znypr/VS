@@ -20,9 +20,6 @@ public class SyslogServer {
 
 	public static void main(String[] args) {
 		
-
-		//CharBuffer msg = StandardCharsets.UTF_8.decode(ByteBuffer);
-		
 		try (DatagramSocket socket = new DatagramSocket(PORT)) {
 			
 			DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
