@@ -22,12 +22,22 @@ public class SyslogServer {
 		
 		try (DatagramSocket socket = new DatagramSocket(PORT)) {
 			
+			System.out.println("start server..");
+			
+			DatagramPacket ipAnswer = new DatagramPacket(new byte[0], 0);			
 			DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
-
+			
 			while (true) {
+
 				socket.receive(packetIn);
-				System.out.println(packetIn.getAddress().getHostAddress() + ":" + packetIn.getPort());
-				System.out.println(new String(packetIn.getData()));
+				
+				if (packetIn.getLength() == 0) {
+					ipAnswer.setSocketAddress(packetIn.getSocketAddress());
+					socket.send(ipAnswer);
+				} else {
+					System.out.println("message from " + packetIn.getAddress().getHostAddress() + ":" + packetIn.getPort());
+					System.out.println("  " + new String(packetIn.getData()));
+				}
 			}
 		} catch (final IOException e) {
 			System.err.println(e);

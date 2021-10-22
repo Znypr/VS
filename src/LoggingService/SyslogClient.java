@@ -33,6 +33,7 @@ public class SyslogClient {
 	private static String BOM = "BOM";
 	
 	
+	
 	private static String getFQDN() {
 		
 		String domainname = "";
@@ -44,24 +45,6 @@ public class SyslogClient {
 		}
 		return domainname;
 	}
-	
-    private static InetAddress getBroadcast() {
-        
-        NetworkInterface nif =null;
-        try {
-            nif = NetworkInterface.getByIndex(1);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        List<java.net.InterfaceAddress> list = nif.getInterfaceAddresses();          
-        try {
-            return InetAddress.getByName(list.get(0).getBroadcast().toString().replaceFirst("/", ""));
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        
-        return null;
-    }
 	
 	private static String getPID() {
 		//return ManagementFactory.getRuntimeMXBean().getName();
@@ -115,6 +98,20 @@ public class SyslogClient {
 		return con.toByteArray();
 	}
 	
+	private static DatagramPacket createIpRequest(int Port) {
+		
+		InetAddress broadcast = null;
+		try {
+			broadcast = InetAddress.getByName("255.255.255.255");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			System.err.println(e);
+		}
+		return new DatagramPacket(new byte[0], 0, broadcast, PORT);
+	}
+	
+	
+	
 	public static void main(String[] args) {
 		
 		try (DatagramSocket socket = new DatagramSocket()) {
@@ -122,20 +119,31 @@ public class SyslogClient {
 			// HEADER
 			String header = createHeader(args[0], args[1], args[2]);
 			
+			
 			// STRUCTURED DATA
 			String sd = "-";
+			
 			
 			// MSG
 			String msg = buildMsg(args[3]);
 			
-			// Syslog Formatted Message
+			
+			// SYSLOG FORMAT MESSAGE
 			byte[] syslogMsg = buildSyslogMsg(header, sd, msg);
 			
 			
 			// AUTO DISCOVERY
-			InetAddress iaddr = getBroadcast();
+			socket.send(createIpRequest(PORT));
+			System.out.println("start autodiscovery..");
 			
-			DatagramPacket packetOut = new DatagramPacket(syslogMsg, syslogMsg.length, iaddr, PORT);
+			DatagramPacket ipAnswer = new DatagramPacket(new byte[0], 0);
+		    socket.receive(ipAnswer);
+		    System.out.println("received: " + ipAnswer.getAddress());
+		    InetAddress serverAddr = ipAnswer.getAddress();
+			
+		    
+			// TRANSPORT
+			DatagramPacket packetOut = new DatagramPacket(syslogMsg, syslogMsg.length, serverAddr, PORT);
 			if (syslogMsg.length <= BUFSIZE) {				
 				socket.send(packetOut);
 			}
