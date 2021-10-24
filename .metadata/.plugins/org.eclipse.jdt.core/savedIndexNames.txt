@@ -1,0 +1,3 @@
+INDEX VERSION 1.131+D:\HSMA\05_Semester\VS\programme\VS\.metadata\.plugins\org.eclipse.jdt.core
+4186696825.index
+4041032348.index
