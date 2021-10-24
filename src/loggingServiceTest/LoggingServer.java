@@ -25,7 +25,7 @@ public class LoggingServer {
         } else { // logging packet
           String log = new String(packetIn.getData(), 0, packetIn.getLength());
           
-          System.out.println("Neue Syslog-Nachricht von " + packetIn.getAddress().getHostAddress() + " erhalten: ");
+          System.out.println("Neue Syslog-Nachricht von " + packetIn.getAddress().getHostAddress() + " (Hostname: " + packetIn.getAddress().getHostName() + ") erhalten: ");
           System.out.println(log);
         }
         
