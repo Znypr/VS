@@ -1,0 +1,84 @@
+package loggingdienst;
+
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketTimeoutException;
+
+public class LoggingClient {
+
+	// Für UDP
+	private static final int PORT = 4712;
+	private static final int TIMEOUT = 2000;
+
+	private static InetAddress serverAddr;
+
+	// Für Syslog
+	private static String appName = "LoggingClient";
+
+	private static String message;
+
+	public static void main(String[] args) {
+
+		try {
+
+			SyslogMessage outMessage = new SyslogMessage(Integer.parseInt(args[0]), Integer.parseInt(args[1]), args[2],
+					args[3], args[4], args[5], args[6]);
+			message = outMessage.messageToString();
+
+		} catch (Exception e) {
+
+			System.out.println(e.getMessage());
+			// Kann man dann das Programm automatisch schließen?
+			// Denn es können nur einmal Parameter eingegeben werden, oder?
+
+		}
+
+		try (DatagramSocket socket = new DatagramSocket()) {
+
+			socket.setSoTimeout(TIMEOUT);
+
+			// AutoDiscovery, Client sendet leeren Broadcast
+			// Server empfängt diesen und sendet seine Adresse als Antwort
+			InetAddress broadcastAddr = InetAddress.getByName("255.255.255.255");
+			DatagramPacket ADpacketOut = new DatagramPacket(new byte[0], 0, broadcastAddr, PORT);
+			socket.send(ADpacketOut);
+
+			DatagramPacket ADpacketIn = new DatagramPacket(new byte[0], 0);
+			socket.receive(ADpacketIn);
+			receiveServerAddress(ADpacketIn.getAddress());
+
+			DatagramPacket packetOut = new DatagramPacket(message.getBytes(), message.getBytes().length, serverAddr,
+					PORT);
+			socket.send(packetOut);
+
+		} catch (SocketTimeoutException e) {
+
+			System.err.println("Timeout: " + e.getMessage());
+
+		} catch (Exception e) {
+
+			System.err.println(e);
+
+		}
+
+	}
+
+	static void receiveServerAddress(InetAddress serverAddress) {
+
+		serverAddr = serverAddress;
+
+	}
+
+}
+
+/*
+ * für das spätere Berechnen von PVAL int facility = 10; int severity = 6; int
+ * pval = (facility*8)+severity;
+ * 
+ * int reverseSeverity = pval % 8; int reverseFacility = (pval -
+ * reverseSeverity) / 8;
+ * 
+ * System.out.println("PVAL is " + pval); System.out.println("Severity is " +
+ * reverseSeverity); System.out.println("Facility is " + reverseFacility);
+ */

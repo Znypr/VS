@@ -1,0 +1,54 @@
+package loggingdienst;
+
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+
+public class LoggingServer {
+
+	private static final int PORT = 4711;
+	private static final int BUFSIZE = 2048;
+
+	public static void main(String[] args) {
+
+		try (DatagramSocket socket = new DatagramSocket(PORT)) {
+			DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
+
+			while (true) {
+				socket.receive(packetIn);
+
+				if (packetIn.getLength() != 0) {
+
+					System.out.println("Received the following message from " + packetIn.getAddress().getHostAddress().toString() + ":");
+					System.out.println(packetIn.getData());
+
+				} else if (packetIn.getLength() > BUFSIZE) {
+					
+					// Eigentlich sollte es schon früher abgefangen werden glaube ich
+					
+				} else if ((packetIn.getLength() == 0) && packetIn.getAddress().toString() == "255.255.255.255"){
+					
+					// Auto Discovery Packet empfangen, es wird ein leeres zurückgesendet
+					DatagramPacket ADpacketOut = new DatagramPacket(new byte[0], BUFSIZE, packetIn.getSocketAddress());
+					socket.send(ADpacketOut);
+					
+				}
+
+			}
+		} catch (IOException e) {
+			
+			System.err.println(e);
+		}
+
+	}
+
+	// muss nicht sein, wäre aber cool
+	SyslogMessage deconstructMessageString(String message) {
+		SyslogMessage deconstructedMessage = new SyslogMessage();
+
+		return deconstructedMessage;
+	}
+
+}
