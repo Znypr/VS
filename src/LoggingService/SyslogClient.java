@@ -14,11 +14,7 @@ public class SyslogClient {
 
 	private static int VERSION = 1;
 
-//	private static final String HOST = getFQDN();
-
 	private static final String BOM = "BOM";
-
-//	private static final String APPNAME = SyslogClient.class.getName();
 
 	private static final int PORT = 4711;
 
@@ -43,28 +39,20 @@ public class SyslogClient {
 		return "<" + priorityValue + ">";
 	}
 
-//	private static String createHeader(String facility, String severity, String msgID) {
-//
-//		String pri = getPRI(facility, severity);
-//		String timestamp = getTimeStamp();
-//		String pid = getPID();
-//
-//		return pri + VERSION + " " + timestamp + " " + HOST + " " + APPNAME + " " + pid + " " + msgID + " ";
-//	}
-	
-	private static String createHeader(String PRI, String TIMESTAMP, String HOSTNAME, String APPNAME, String PROCID, String MSGID) {
-		return PRI + VERSION + " " + TIMESTAMP + " " + HOSTNAME + " " + APPNAME + " " + PROCID + " " + MSGID + " ";
+	private static String createHeader(String pri, String timestamp, String hostname, String appname, String procid,
+			String msgid) {
+		return pri + VERSION + " " + timestamp + " " + hostname + " " + appname + " " + procid + " " + msgid + " ";
 	}
 
-	private static String getHostName(String hostname) {
-		if (hostname.isEmpty()) {
+	private static String getHostName() {
+		try {
+			return InetAddress.getLocalHost().getCanonicalHostName();
+		} catch (UnknownHostException e) {
 			try {
 				return InetAddress.getLocalHost().getHostAddress();
-			} catch (UnknownHostException e) {
+			} catch (UnknownHostException e2) {
 				return "-"; // NILVALUE
 			}
-		} else {
-			return hostname;
 		}
 	}
 
@@ -93,50 +81,40 @@ public class SyslogClient {
 			con.write(byteSD);
 			con.write(byteMsg);
 		} catch (Exception e) {
-			System.err.println("Timeout: " + e.getMessage());
+			System.err.println("Error while building the SyslogMsg: " + e.getMessage());
 		}
 
 		return con.toByteArray();
 	}
 
-//	private static DatagramPacket createIpRequest(int Port) {
-//
-//		InetAddress broadcast = null;
-//		try {
-//			broadcast = InetAddress.getByName("255.255.255.255");
-//		} catch (Exception e) {
-//			System.err.println(e);
-//		}
-//		return new DatagramPacket(new byte[0], 0, broadcast, PORT);
-//	}
-
 	public static void main(String[] args) {
 
-		if (args.length != 6) {
+		if (args.length != 5) {
 			throw new RuntimeException(
-					"Es wurden nicht alle 6 benötigten Kommandozeilenparameter eingegeben. Bitte prüfen Sie Ihre Kommandozeilenparameter und ggf. die Dokumentation dieser Anwendung.");
+					"Es wurden nicht alle 5 benötigten Kommandozeilenparameter eingegeben. Bitte prüfen Sie Ihre Kommandozeilenparameter und ggf. die Dokumentation dieser Anwendung.");
 		}
-		
+
 		try (DatagramSocket socket = new DatagramSocket()) {
 			socket.setSoTimeout(TIMEOUT);
 
 			System.out.println("Sende autodiscovery message.");
 			InetAddress discoveryIaddr = InetAddress.getByName("255.255.255.255");
 			DatagramPacket discoveryPacketOut = new DatagramPacket(new byte[0], 0, discoveryIaddr, PORT);
-			socket.send(discoveryPacketOut);			
+			socket.send(discoveryPacketOut);
 
 			DatagramPacket discoveryPacketIn = new DatagramPacket(new byte[0], 0);
 			socket.receive(discoveryPacketIn);
 			InetAddress loggingServerIaddr = discoveryPacketIn.getAddress();
-			
-			System.out.println("IP vom Logging-Server gefunden: " + loggingServerIaddr.getHostAddress() + " . Sende Syslog-Nachricht...");
-			
+
+			System.out.println("IP vom Logging-Server gefunden: " + loggingServerIaddr.getHostAddress()
+					+ " . Sende Syslog-Nachricht...");
+
 			String PRI = getPRI(args[0], args[1]);
 			String TIMESTAMP = getTimeStamp();
-			String HOSTNAME = getHostName(args[2]);
-			String APPNAME = getValidArgument(args[3]);
+			String HOSTNAME = getHostName();
+			String APPNAME = getValidArgument(args[2]);
 			String PROCID = getPID();
-			String MSGID = getValidArgument(args[4]);
+			String MSGID = getValidArgument(args[3]);
 
 			// HEADER
 			String header = createHeader(PRI, TIMESTAMP, HOSTNAME, APPNAME, PROCID, MSGID);
@@ -145,33 +123,18 @@ public class SyslogClient {
 			String sd = "-";
 
 			// MSG
-			String msg = buildMsg(args[5]);
+			String msg = buildMsg(args[4]);
 
 			// SYSLOG FORMAT MESSAGE
 			byte[] syslogMsg = buildSyslogMsg(header, sd, msg);
-			
+
 			if (syslogMsg.length > BUFSIZE) {
-				throw new RuntimeException("Die Syslog Nachricht ist mit " + syslogMsg.length + " Bytes zu lang! Maximal "
-						+ BUFSIZE + " Bytes zulässig.");
+				throw new RuntimeException("Die Syslog Nachricht ist mit " + syslogMsg.length
+						+ " Bytes zu lang! Maximal " + BUFSIZE + " Bytes zulässig.");
 			} else {
 				DatagramPacket packetOut = new DatagramPacket(syslogMsg, syslogMsg.length, loggingServerIaddr, PORT);
 				socket.send(packetOut);
 			}
-
-			// AUTO DISCOVERY
-//			socket.send(createIpRequest(PORT));
-//			System.out.println("starting autodiscovery..");
-//
-//			DatagramPacket ipAnswer = new DatagramPacket(new byte[0], 0);
-//			socket.receive(ipAnswer);
-//			System.out.println("  received: " + ipAnswer.getAddress());
-//			InetAddress serverAddr = ipAnswer.getAddress();
-//
-//			// TRANSPORT
-//			DatagramPacket packetOut = new DatagramPacket(syslogMsg, syslogMsg.length, serverAddr, PORT);
-//			if (syslogMsg.length <= BUFSIZE) {
-//				socket.send(packetOut);
-//			}
 
 		} catch (SocketTimeoutException e) {
 			System.err.println("Timeout: " + e.getMessage());
