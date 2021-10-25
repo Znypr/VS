@@ -8,12 +8,12 @@ import java.util.Date;
 
 public class speedTestClient {
 
-  private static final String HOST = "79.199.68.231";
+  private static final String HOST = "localhost";
   private static final int PORT = 4711;
   private static final int BUFSIZE = 64000;
   private static final int TIMEOUT = 2000;
 
-  private static final int RUNCOUNT = 3;
+  private static final int RUNCOUNT = 5000;
 
   public static void main(String[] args) {
     try (DatagramSocket socket = new DatagramSocket()) {
@@ -47,11 +47,11 @@ public class speedTestClient {
         DatagramPacket packetOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE, iaddr, PORT);
         DatagramPacket packetIn = new DatagramPacket(new byte[0], 0);
 
-        long sendtime = new Date().getTime();
+        long sendtime = System.nanoTime();
         socket.send(packetOut);
 
         socket.receive(packetIn);
-        long receiveTime = new Date().getTime();
+        long receiveTime = System.nanoTime();
 
         latencies[i] = receiveTime - sendtime;
 
@@ -63,7 +63,7 @@ public class speedTestClient {
         averageLatency = 1; // to stop divisions by zero
       }
 
-      float averageUploadMBPerSecond = ((float) 1000 / averageLatency * BUFSIZE) / 1024 / 1024;
+      float averageUploadMBPerSecond = ((float) 1e9 / averageLatency * BUFSIZE) / 1024 / 1024;
 
       System.out
           .println("Average Upload Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
