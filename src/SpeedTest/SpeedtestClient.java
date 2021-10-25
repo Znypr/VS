@@ -17,19 +17,19 @@ public class SpeedtestClient {
 
 	private static final int TIMEOUT = 2000;
 	
-	private static final int RUNS = 5000;
+	private static final int RUNS = 1;
 	
 	private static final DecimalFormat f = new DecimalFormat("##.00");
 	
 	
-	private static float getMedian(float[] array) {
-		 float median = 0;
+	private static float getAverage(long[] array) {
+		 long avg = 0;
 		 
 		 for(int i=0; i<array.length; i++) {
-			 median += array[i];
+			 avg += array[i];
 		 }
 		 
-		 return median/array.length;
+		 return avg/array.length;
 	}
 
 	private static float byte_to_megabit(int b) {
@@ -49,7 +49,7 @@ public class SpeedtestClient {
 			
 			// LATENCY 
 			{
-				float[] latency = new float[RUNS];
+				long[] latency = new long[RUNS];
 				
 				for(int i=0; i<RUNS; i++) {
 					
@@ -61,14 +61,15 @@ public class SpeedtestClient {
 					socket.receive(latencyIn);
 					stopTime = System.nanoTime();
 					
-					latency[i] = (float) ((stopTime-startTime)/1e3);
+					latency[i] = stopTime-startTime;
 				}
-				System.out.println("Latency:        " + f.format(getMedian(latency)) + "ms");
+				float latency_ms = (float) (getAverage(latency)/1e6);
+				System.out.println("Latency:        " + f.format(latency_ms) + "ms");
 			}
 		
 			// UPLOAD 
 			{		
-				float[] upload = new float[RUNS];
+				long[] uploadTime = new long[RUNS];
 						
 				for(int i=0; i<RUNS; i++) {
 						
@@ -79,16 +80,16 @@ public class SpeedtestClient {
 					DatagramPacket uploadIn = new DatagramPacket(new byte[0], 0);
 					socket.receive(uploadIn);
 					stopTime = System.nanoTime();
-					
-					float uploadTime_in_s = (float) (((float) (stopTime-startTime))/ 1e6);
-					upload[i] = byte_to_megabit(BUFSIZE) / uploadTime_in_s;
+							
+					uploadTime[i] = stopTime-startTime;
 				}
-				System.out.println("Upload Speed:   " + f.format(getMedian(upload)) + "Mbps");
+				float uploadSpeed = ((float) 1e9 / getAverage(uploadTime) * BUFSIZE) / 1024 / 1024;
+				System.out.println("Upload Speed:   " + f.format(uploadSpeed) + "Mbps");
 			}
 			
 			// DOWNLOAD 
 			{
-				float[] download = new float[RUNS];
+				long[] downloadTime = new long[RUNS];
 						
 				for(int i=0; i<RUNS; i++) {
 						
@@ -100,10 +101,10 @@ public class SpeedtestClient {
 					socket.receive(downloadIn);
 					stopTime = System.nanoTime();
 					
-					float downloadTime_in_s = (float) (((float) (stopTime-startTime))/ 1e6);
-					download[i] = byte_to_megabit(BUFSIZE) / downloadTime_in_s;
+					downloadTime[i] = stopTime-startTime;
 				}
-				System.out.println("Download Speed: " + f.format(getMedian(download)) + "Mbps");
+				float downloadSpeed = ((float) 1e9 / getAverage(downloadTime) * BUFSIZE) / 1024 / 1024;
+				System.out.println("Download Speed: " + f.format(downloadSpeed) + "Mbps");
 				
 			}
 
