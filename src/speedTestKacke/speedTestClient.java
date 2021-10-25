@@ -8,113 +8,110 @@ import java.util.Date;
 
 public class speedTestClient {
 
-  private static final String HOST = "79.199.68.231";
-  private static final int PORT = 4711;
-  private static final int BUFSIZE = 64000;
-  private static final int TIMEOUT = 2000;
+	private static final String HOST = "79.199.69.122";
+	private static final int PORT = 4711;
+	private static final int BUFSIZE = 64000;
+	private static final int TIMEOUT = 2000;
 
-  private static final int RUNCOUNT = 3;
+	private static final int RUNCOUNT = 10;
 
-  public static void main(String[] args) {
-    try (DatagramSocket socket = new DatagramSocket()) {
-      socket.setSoTimeout(TIMEOUT);
-      InetAddress iaddr = InetAddress.getByName(HOST);
+	public static void main(String[] args) {
 
-      long[] latencies = new long[RUNCOUNT];
+		try (DatagramSocket socket = new DatagramSocket()) {
+			socket.setSoTimeout(TIMEOUT);
+			InetAddress iaddr = InetAddress.getByName(HOST);
 
-      for (int i = 0; i < RUNCOUNT; i++) {
-        DatagramPacket packetOut = new DatagramPacket(new byte[1], 1, iaddr, PORT);
-        DatagramPacket packetIn = new DatagramPacket(new byte[1], 1);
+			long[] latencies = new long[RUNCOUNT];
 
-        long sendtime = new Date().getTime();
-        socket.send(packetOut);
+			for (int i = 0; i < RUNCOUNT; i++) {
+				DatagramPacket packetOut = new DatagramPacket(new byte[0], 0, iaddr, PORT);
+				DatagramPacket packetIn = new DatagramPacket(new byte[0], 0);
 
-        socket.receive(packetIn);
-        long receiveTime = new Date().getTime();
+				long sendtime = new Date().getTime();
+				socket.send(packetOut);
 
-        latencies[i] = receiveTime - sendtime;
+				socket.receive(packetIn);
+				long receiveTime = new Date().getTime();
 
-      }
+				latencies[i] = receiveTime - sendtime;
 
-      long averageLatency = calculateAverageLatency(latencies);
-      System.out.println("Average Latency mit leeren Datagram Paketen: " + averageLatency + "ms");
+			}
 
-      // Upload
+			long averageLatency = calculateAverageLatency(latencies);
+			System.out.println("Average Latency mit leeren Datagram Paketen: " + averageLatency + "ms");
 
-      latencies = new long[RUNCOUNT];
+			// Upload
+			latencies = new long[RUNCOUNT];
 
-      for (int i = 0; i < RUNCOUNT; i++) {
-        DatagramPacket packetOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE, iaddr, PORT);
-        DatagramPacket packetIn = new DatagramPacket(new byte[0], 0);
+			for (int i = 0; i < RUNCOUNT; i++) {
+				DatagramPacket packetOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE, iaddr, PORT);
+				DatagramPacket packetIn = new DatagramPacket(new byte[0], 0);
 
-        long sendtime = new Date().getTime();
-        socket.send(packetOut);
+				long sendtime = System.nanoTime();
 
-        socket.receive(packetIn);
-        long receiveTime = new Date().getTime();
+				socket.send(packetOut);
+				socket.receive(packetIn);
+				long receiveTime = System.nanoTime();
 
-        latencies[i] = receiveTime - sendtime;
+				latencies[i] = receiveTime - sendtime;
 
-      }
+			}
 
-      averageLatency = calculateAverageLatency(latencies);
+			averageLatency = calculateAverageLatency(latencies);
 
-      if (averageLatency == 0) {
-        averageLatency = 1; // to stop divisions by zero
-      }
+//			if (averageLatency == 0) {
+//				averageLatency = 1; // to stop divisions by zero
+//			}
 
-      float averageUploadMBPerSecond = ((float) 1000 / averageLatency * BUFSIZE) / 1024 / 1024;
+			float averageUploadMBPerSecond = ((float) (1000000*1000) / averageLatency * BUFSIZE) / 1024 / 1024;
 
-      System.out
-          .println("Average Upload Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
-      System.out.println("Average Upload speed: " + averageUploadMBPerSecond + "MB/s");
+//			System.out.println("Average Upload Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
+			System.out.println("Average Upload speed: " + averageUploadMBPerSecond + " MB/s");
 
-      
-      // download
-      
-      latencies = new long[RUNCOUNT];
+			// download
 
-      for (int i = 0; i < RUNCOUNT; i++) {
-        DatagramPacket packetOut = new DatagramPacket(new byte[0], 0, iaddr, PORT);
-        DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
+			latencies = new long[RUNCOUNT];
 
-        long sendtime = new Date().getTime();
-        socket.send(packetOut);
+			for (int i = 0; i < RUNCOUNT; i++) {
+				DatagramPacket packetOut = new DatagramPacket(new byte[1], 1, iaddr, PORT);
+				DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
 
-        socket.receive(packetIn);
-        long receiveTime = new Date().getTime();
+				socket.send(packetOut);
+				long sendtime = System.nanoTime();
 
-        latencies[i] = receiveTime - sendtime;
+				socket.receive(packetIn);
+				long receiveTime = System.nanoTime();
 
-      }
+				latencies[i] = receiveTime - sendtime;
 
-      averageLatency = calculateAverageLatency(latencies);
+			}
 
-      if (averageLatency == 0) {
-        averageLatency = 1; // to stop divisions by zero
-      }
+			averageLatency = calculateAverageLatency(latencies);
 
-      float averageDownloadMBPerSecond = ((float) 1000 / averageLatency * BUFSIZE) / 1024 / 1024;
+//			if (averageLatency == 0) {
+//				averageLatency = 1; // to stop divisions by zero
+//			}
 
-      System.out
-          .println("Average Download Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
-      System.out.println("Average Download speed: " + averageDownloadMBPerSecond + "MB/s");
+			float averageDownloadMBPerSecond = ((float) (1000000*1000) / averageLatency * BUFSIZE) / 1024 / 1024;
 
-    } catch (SocketTimeoutException e) {
-      System.err.println("Timeout: " + e.getMessage());
-    } catch (Exception e) {
-      System.err.println(e);
-    }
-  }
+//			System.out.println("Average Download Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
+			System.out.println("Average Download speed: " + averageDownloadMBPerSecond + " MB/s");
 
-  private static long calculateAverageLatency(long[] latencies) {
-    int latencySum = 0;
+		} catch (SocketTimeoutException e) {
+			System.err.println("Timeout: " + e.getMessage());
+		} catch (Exception e) {
+			System.err.println(e);
+		}
+	}
 
-    for (long latency : latencies) {
-      latencySum += latency;
-    }
+	private static long calculateAverageLatency(long[] latencies) {
+		long latencySum = 0;
 
-    return latencySum / RUNCOUNT;
-  }
+		for (long latency : latencies) {
+			latencySum += latency;
+		}
+
+		return latencySum / RUNCOUNT;
+	}
 
 }

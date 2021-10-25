@@ -20,7 +20,7 @@ public class speedTestServer {
         socket.receive(packetIn);
         System.out.println("Nachricht erhalten");
         
-        if (packetIn.getLength() == 1) {
+        if (packetIn.getLength() == 0) {
           packetOut.setData(new byte[64000]);
           packetOut.setLength(64000);
         } else if (packetIn.getLength() == BUFSIZE) {
