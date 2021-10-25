@@ -48,8 +48,8 @@ public class speedTestClient {
 				DatagramPacket packetIn = new DatagramPacket(new byte[0], 0);
 
 				long sendtime = System.nanoTime();
-
 				socket.send(packetOut);
+
 				socket.receive(packetIn);
 				long receiveTime = System.nanoTime();
 
@@ -63,7 +63,7 @@ public class speedTestClient {
 //				averageLatency = 1; // to stop divisions by zero
 //			}
 
-			float averageUploadMBPerSecond = ((float) (1000000*1000) / averageLatency * BUFSIZE) / 1024 / 1024;
+			float averageUploadMBPerSecond = ((float) 1e9 / averageLatency * BUFSIZE) / 1024 / 1024;
 
 //			System.out.println("Average Upload Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
 			System.out.println("Average Upload speed: " + averageUploadMBPerSecond + " MB/s");
@@ -92,7 +92,7 @@ public class speedTestClient {
 //				averageLatency = 1; // to stop divisions by zero
 //			}
 
-			float averageDownloadMBPerSecond = ((float) (1000000*1000) / averageLatency * BUFSIZE) / 1024 / 1024;
+			float averageDownloadMBPerSecond = ((float) (1000000 * 1000) / averageLatency * BUFSIZE) / 1024 / 1024;
 
 //			System.out.println("Average Download Latency mit " + BUFSIZE + " Byte Daten: " + averageLatency + "ms");
 			System.out.println("Average Download speed: " + averageDownloadMBPerSecond + " MB/s");
