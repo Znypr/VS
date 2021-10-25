@@ -17,28 +17,33 @@ public class SpeedtestServer {
 			System.out.println("Server gestartet ...");
 
 			DatagramPacket packetIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
-			DatagramPacket packetOut;
+			DatagramPacket packetOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
 
-			while (true) {
-				socket.receive(packetIn);
-
-				// Latenz
-				if (packetIn.getLength() == 0) {
-					packetOut = new DatagramPacket(new byte[0], 0);
-				} 
-				
-				// Upload Test
-				else if (packetIn.getLength() == BUFSIZE) {
-					packetOut = new DatagramPacket(new byte[0], 0);
-				} 
-				// Download Test
-				else {
-					packetOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
-				}
-				
-				packetOut.setSocketAddress(packetIn.getSocketAddress());
-				socket.send(packetOut);
-			}
+		      while (true) {
+		          
+		          socket.receive(packetIn);
+		          
+		          // Download-Messung
+		          if (packetIn.getLength() == 1) {
+		            packetOut.setData(new byte[BUFSIZE]);
+		            packetOut.setLength(BUFSIZE);
+		          } 
+		          // Upload-Messung
+		          else if (packetIn.getLength() == BUFSIZE) {
+		            packetOut.setData(new byte[0]);
+		            packetOut.setLength(0);
+		          } 
+		          // Latenz-Messung
+		          else {      
+		        	  packetOut.setData(new byte[0]);
+			          packetOut.setLength(0);
+		          }
+		          
+		          packetOut.setSocketAddress(packetIn.getSocketAddress());
+		          
+		          socket.send(packetOut);
+		          
+		        }
 
 		} catch (final IOException e) {
 			System.err.println(e);

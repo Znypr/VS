@@ -5,11 +5,11 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
+import java.util.Date;
 
 public class SpeedtestClient {
 
-
-	private static final String HOST = "79.199.69.122";
+	private static final String HOST = "localhost";
 
 	private static final int PORT = 4711;
 
@@ -46,12 +46,12 @@ public class SpeedtestClient {
 			long[] latency = new long[RUNCOUNT];
 
 			for(int i = 0; i < RUNCOUNT; i++) {
-
 				DatagramPacket latencyOut = new DatagramPacket(new byte[0], 0, iaddr, PORT);
+				DatagramPacket latencyIn = new DatagramPacket(new byte[0], 0);
+
 				startTime = System.nanoTime();
 				socket.send(latencyOut);
 
-				DatagramPacket latencyIn = new DatagramPacket(new byte[0], 0);
 				socket.receive(latencyIn);
 				stopTime = System.nanoTime();
 
@@ -66,12 +66,12 @@ public class SpeedtestClient {
 			long[] uploadTime = new long[RUNCOUNT];
 
 			for (int i = 0; i < RUNCOUNT; i++) {
-
 				DatagramPacket uploadOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE, iaddr, PORT);
+				DatagramPacket uploadIn = new DatagramPacket(new byte[0], 0);
+
 				startTime = System.nanoTime();
 				socket.send(uploadOut);
 
-				DatagramPacket uploadIn = new DatagramPacket(new byte[0], 0);
 				socket.receive(uploadIn);
 				stopTime = System.nanoTime();
 
@@ -86,12 +86,12 @@ public class SpeedtestClient {
 			long[] downloadTime = new long[RUNCOUNT];
 
 			for (int i = 0; i < RUNCOUNT; i++) {
-
 				DatagramPacket downloadOut = new DatagramPacket(new byte[1], 1, iaddr, PORT);
+				DatagramPacket downloadIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
+
 				startTime = System.nanoTime();
 				socket.send(downloadOut);
 
-				DatagramPacket downloadIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
 				socket.receive(downloadIn);
 				stopTime = System.nanoTime();
 
