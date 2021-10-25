@@ -80,7 +80,7 @@ public class SpeedtestClient {
 				uploadTime[i] = stopTime-startTime;
 			}
 			float uploadSpeed = ((float) 1e9 / getAverage(uploadTime) * BUFSIZE) / 1000 / 1000;
-			System.out.println("Upload Speed:   " + f.format(uploadSpeed) + "MBps");
+			System.out.println("Upload Speed:   " + f.format(uploadSpeed) + "Mbps");
 		
 		
 		// DOWNLOAD 
@@ -100,7 +100,7 @@ public class SpeedtestClient {
 				downloadTime[i] = stopTime-startTime;
 			}
 			float downloadSpeed = ((float) 1e9 / getAverage(downloadTime) * BUFSIZE) / 1000 / 1000;
-			System.out.println("Download Speed: " + f.format(downloadSpeed) + "MBps");
+			System.out.println("Download Speed: " + f.format(downloadSpeed) + "Mbps");
 				
 		
 
