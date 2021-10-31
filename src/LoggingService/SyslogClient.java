@@ -23,6 +23,7 @@ public class SyslogClient {
 	private static final int TIMEOUT = 2000;
 
 	private static String getPID() {
+		// gibt die ProcessID des aktuellen Prozesses zurück, da dies für als PROCID im header der Syslog-Nachricht verwendet wird
 		return Long.toString(ProcessHandle.current().pid());
 	}
 
@@ -45,6 +46,8 @@ public class SyslogClient {
 	}
 
 	private static String getHostName() {
+		// es wird versucht, den hostname automatisch zu ermitteln. Wenn dies fehlschlägt, wird versucht die IP automatisch zu ermitteln.
+		// Falls beides fehlschlägt, wird die Nilvalue für den hostname verwendet.
 		try {
 			return InetAddress.getLocalHost().getCanonicalHostName();
 		} catch (UnknownHostException e) {
@@ -65,6 +68,7 @@ public class SyslogClient {
 	}
 
 	private static String buildMsg(String msg) {
+		// BOM steht vor der Nachricht, da die Nachricht in UTF-8 codiert wird.
 		return " " + BOM + msg;
 	}
 
@@ -72,6 +76,7 @@ public class SyslogClient {
 
 		ByteArrayOutputStream con = new ByteArrayOutputStream();
 
+		// header wird in ASCII codiert und die message in UTF-8
 		byte[] byteheader = header.getBytes(StandardCharsets.US_ASCII);
 		byte[] byteSD = sd.getBytes();
 		byte[] byteMsg = msg.getBytes(StandardCharsets.UTF_8);
@@ -143,6 +148,7 @@ public class SyslogClient {
 		}
 	}
 
+	// Validiert und wandelt die User-Eingabe im Kommandozeilenparameter für die facility bei der PRI in den passenden numerischen Code um
 	private static int getFacilityCode(String facility) {
 		switch (facility) {
 		case "0":
@@ -245,6 +251,7 @@ public class SyslogClient {
 
 	}
 
+	// Validiert und wandelt die User-Eingabe im Kommandozeilenparameter für die severity bei der PRI in den passenden numerischen Code um
 	private static int getSeverityCode(String severity) {
 		switch (severity) {
 		case "0":

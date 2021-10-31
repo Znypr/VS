@@ -42,9 +42,12 @@ public class SpeedtestClient {
 			socket.setSoTimeout(TIMEOUT); 
 			InetAddress iaddr = InetAddress.getByName(HOST);	     
 
-			// LATENCY 
-			long[] latency = new long[RUNCOUNT];
+			// Latenz-Messung
+			long[] latencies = new long[RUNCOUNT];
 
+			// An den Server wird ein Datagram-Pakete mit einer Länge von 0 Byte an der Server geschickt. Der Server antwortet auch mit einer Länge von 0 Bytes.
+			// Es wird gemessen, wie viele Nanosekunden dies dauert
+			// Je nach "RUNCOUNT" wird dies mehrmals wiederholt um die Latenz im Durchschnitt zu berechnen.
 			for(int i = 0; i < RUNCOUNT; i++) {
 				DatagramPacket latencyOut = new DatagramPacket(new byte[0], 0, iaddr, PORT);
 				DatagramPacket latencyIn = new DatagramPacket(new byte[0], 0);
@@ -55,17 +58,24 @@ public class SpeedtestClient {
 				socket.receive(latencyIn);
 				stopTime = System.nanoTime();
 
-				latency[i] = stopTime-startTime;
+				latencies[i] = stopTime-startTime;
 			}
-			float latency_ms = (float) (getAverage(latency)/1e6);
+			// Aus dem Durchschnitt wird dann die durchschnittliche Latenz in Millisekunden berechnet
+			float latency_ms = (float) (getAverage(latencies) / 1e6);
 			System.out.println("Latency:        " + f.format(latency_ms) + "ms");
 
 
-			// UPLOAD 
 
-			long[] uploadTime = new long[RUNCOUNT];
+			// Upload-Messung
+			long[] uploadTimes = new long[RUNCOUNT];
 
+			// Um den Upload zu testen wird an den Server ein Datagram-Pakete mit einer Länge von BUFSIZE (in diesem Fall 65.000 Bytes) gesendet.
+			// Der Server antwortet mit einem Datagram-Pakete mit 0 Bytes, da ja nur der Upload getestet werden soll 
+			// und der Download deshalb entsprechend schnell sein sollte um das Ergebnis nicht zu stark zu verfälschen.
+			// Dabei wird in Nanosekunden gemessen, wie lange dieser Vorgang dauert.
+			// Dieser Vorgang wird je nach "RUNCOUNT" mehrmals wiederholt.
 			for (int i = 0; i < RUNCOUNT; i++) {
+				
 				DatagramPacket uploadOut = new DatagramPacket(new byte[BUFSIZE], BUFSIZE, iaddr, PORT);
 				DatagramPacket uploadIn = new DatagramPacket(new byte[0], 0);
 
@@ -75,16 +85,22 @@ public class SpeedtestClient {
 				socket.receive(uploadIn);
 				stopTime = System.nanoTime();
 
-				uploadTime[i] = stopTime-startTime;
+				uploadTimes[i] = stopTime-startTime;
 			}
-			float uploadSpeed = ((float) 1e9 / getAverage(uploadTime) * BUFSIZE) / 1000 / 1000;
+			// Aus der gemessenen durchschnittlichen Dauer wird dann die Upload-Geschwindigkeit in Megabyte pro Sekunden berechnet.
+			float uploadSpeed = ((float) 1e9 / getAverage(uploadTimes) * BUFSIZE) / 1000 / 1000;
 			System.out.println("Upload Speed:   " + f.format(uploadSpeed) + "MBps");
 
 
-			// DOWNLOAD 
-
-			long[] downloadTime = new long[RUNCOUNT];
-
+			
+			// Download-Messung
+			long[] downloadTimes = new long[RUNCOUNT];
+			
+			// Um den Download zu testen wird an den Server ein Datagram-Pakete mit einer Länge von einem Byte gesendet, da ja nur der Download getestet werden soll 
+			// und der Upload deshalb entsprechend schnell sein sollte um das Ergebnis nicht zu stark zu verfälschen
+			// Der Server antwortet mit einem Datagram-Pakete mit BUFSIZE (in diesem Fall 65.000 Bytes) Bytes.
+			// Dabei wird in Nanosekunden gemessen, wie lange dieser Vorgang dauert.
+			// Dieser Vorgang wird je nach "RUNCOUNT" mehrmals wiederholt.
 			for (int i = 0; i < RUNCOUNT; i++) {
 				DatagramPacket downloadOut = new DatagramPacket(new byte[1], 1, iaddr, PORT);
 				DatagramPacket downloadIn = new DatagramPacket(new byte[BUFSIZE], BUFSIZE);
@@ -95,9 +111,10 @@ public class SpeedtestClient {
 				socket.receive(downloadIn);
 				stopTime = System.nanoTime();
 
-				downloadTime[i] = stopTime-startTime;
+				downloadTimes[i] = stopTime-startTime;
 			}
-			float downloadSpeed = ((float) 1e9 / getAverage(downloadTime) * BUFSIZE) / 1000 / 1000;
+			// Aus der gemessenen durchschnittlichen Dauer wird dann die Download-Geschwindigkeit in Megabyte pro Sekunden berechnet.
+			float downloadSpeed = ((float) 1e9 / getAverage(downloadTimes) * BUFSIZE) / 1000 / 1000;
 			System.out.println("Download Speed: " + f.format(downloadSpeed) + "MBps");
 
 		} catch (SocketTimeoutException e) {
