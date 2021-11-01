@@ -5,7 +5,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
-import java.util.Date;
 
 public class SpeedtestClient {
 
