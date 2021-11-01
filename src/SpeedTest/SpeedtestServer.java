@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+// Abgabe von Gruppe A
 public class SpeedtestServer {
 
 	private static final int PORT = 4711;

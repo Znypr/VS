@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//Abgabe von Gruppe A
 public class SyslogClient {
 
 	private static int VERSION = 1;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
+//Abgabe von Gruppe A
 public class SyslogServer {
 	private static final int PORT = 4711;
 	private static final int BUFSIZE = 2048;

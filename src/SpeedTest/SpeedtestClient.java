@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.text.DecimalFormat;
 
+//Abgabe von Gruppe A
 public class SpeedtestClient {
 
 	private static final String HOST = "localhost";
