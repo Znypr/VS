@@ -18,7 +18,7 @@ public class SpeedtestClient {
 
 	private static final int RUNCOUNT = 5;
 
-	private static final DecimalFormat f = new DecimalFormat("##.00");
+	private static final DecimalFormat f = new DecimalFormat("#0.00");
 
 
 	private static float getAverage(long[] array) {
