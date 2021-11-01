@@ -45,7 +45,7 @@ public class SpeedtestClient {
 			// Latenz-Messung
 			long[] latencies = new long[RUNCOUNT];
 
-			// An den Server wird ein Datagram-Pakete mit einer Länge von 0 Byte an der Server geschickt. Der Server antwortet auch mit einer Länge von 0 Bytes.
+			// An den Server wird ein Datagram-Pakete mit einer Länge von 0 Byte geschickt. Der Server antwortet auch mit einer Länge von 0 Bytes.
 			// Es wird gemessen, wie viele Nanosekunden dies dauert
 			// Je nach "RUNCOUNT" wird dies mehrmals wiederholt um die Latenz im Durchschnitt zu berechnen.
 			for(int i = 0; i < RUNCOUNT; i++) {
