@@ -23,7 +23,7 @@ public class SyslogClient {
 	private static final int TIMEOUT = 2000;
 
 	private static String getPID() {
-		// gibt die ProcessID des aktuellen Prozesses zurück, da dies für als PROCID im header der Syslog-Nachricht verwendet wird
+		// gibt die ProcessID des aktuellen Prozesses zurück, da dies als PROCID im header der Syslog-Nachricht verwendet wird
 		return Long.toString(ProcessHandle.current().pid());
 	}
 
