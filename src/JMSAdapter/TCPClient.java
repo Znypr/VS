@@ -22,16 +22,24 @@ public class TCPClient {
 
 			// Zeile von Konsole einlesen, an Server senden und Antwort von
 			// Server auf Konsole ausgeben, bis eingegebene Zeile == "q"
+			
 			while (true) {
-				System.out.print(">> ");
-				String line = stdin.readLine();
-				if ("q".equals(line)) {
-					break;
+				
+				if (stdin.ready()) {
+					String line = stdin.readLine();
+					
+					if ("q".equals(line)) {
+						break;
+					}
+					out.println(line);
 				}
-				out.println(line);
-
-				System.out.println(in.readLine());
+				
+				if (in.ready()) {
+					System.out.println(in.readLine());
+				}
+				
 			}
+			
 		} catch (Exception e) {
 			System.err.println(e);
 		}

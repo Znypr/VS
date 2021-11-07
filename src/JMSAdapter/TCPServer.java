@@ -100,18 +100,21 @@ public class TCPServer implements MessageListener {
 			try (BufferedReader in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 					PrintWriter out = new PrintWriter(this.socket.getOutputStream(), true)) {
 				out.println("Server ist bereit ...");
-				String input;
+				
 				while (true) {
-
+					
 					if (newMessage) {
 						out.println(messageText);
 						newMessage = false;
-					} else {
-						input = in.readLine();
+					} 
+					
+					if (in.ready()){
+						System.out.println("blocking lol");
+						String input = in.readLine();
 						System.out.println("In die Que reingeschrieben: " + input);
 						sendMessage(input, "low");
 					}
-
+					
 				}
 			} catch (Exception e) {
 				System.err.println(e);
