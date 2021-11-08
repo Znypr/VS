@@ -1,4 +1,4 @@
-package JMSAdapter;
+package de.hs_mannheim.vs;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -23,8 +23,7 @@ public class TCPClient {
 			// Zeile von Konsole einlesen, an Server senden und Antwort von
 			// Server auf Konsole ausgeben, bis eingegebene Zeile == "q"
 			
-			while (true) {
-				
+			while (true) {		
 				if (stdin.ready()) {
 					String line = stdin.readLine();
 					
@@ -36,8 +35,7 @@ public class TCPClient {
 				
 				if (in.ready()) {
 					System.out.println(in.readLine());
-				}
-				
+				}	
 			}
 			
 		} catch (Exception e) {

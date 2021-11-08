@@ -1,4 +1,4 @@
-package JMSAdapter;
+package de.hs_mannheim.vs;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -12,16 +12,21 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 public class ProducerNode {
+	private final static String MESSAGE = "TextFuerQueue";
+	private final static String PRIORITY = "HIGH";
+	private final String SEND_DESTINATION = Conf.TOPIC;
+	
 	private Connection connection;
 	private Session session;
 	private MessageProducer producer;
+	
 
 	public ProducerNode() throws NamingException, JMSException {
 		Context ctx = new InitialContext();
 		ConnectionFactory factory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
 		this.connection = factory.createConnection();
 		this.session = this.connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Destination queue = (Destination) ctx.lookup("JMSAdapter.spectatorQueue");
+		Destination queue = (Destination) ctx.lookup(SEND_DESTINATION);
 		this.producer = this.session.createProducer(queue);
 	}
 
@@ -33,12 +38,10 @@ public class ProducerNode {
 	}
 
 	public static void main(String[] args) {
-		String text = "TextFuerQue";
-		String priority = "high";
 		ProducerNode node = null;
 		try {
 			node = new ProducerNode();
-			node.sendMessage(text, priority);
+			node.sendMessage(MESSAGE, PRIORITY);
 		} catch (NamingException | JMSException e) {
 			System.err.println(e);
 		} finally {
