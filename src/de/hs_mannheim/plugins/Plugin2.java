@@ -31,7 +31,7 @@ public class Plugin2 implements PluginInterface{
 		String returnMessage = message;
 			
 		for (int i = 0; i < names.size(); i++) {
-			if (returnMessage.contains(names.get(i))) {
+			while (returnMessage.contains(names.get(i))) {
 				StringBuilder builder = new StringBuilder(returnMessage);
 				
 				int startIndex = returnMessage.indexOf(names.get(i));
