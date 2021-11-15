@@ -21,7 +21,7 @@ public class TCPClient {
 			String msg = in.readLine();
 			System.out.println(msg);
 			
-			// Nebenläufiger Thread, derr UserInput aus der Console einliest und an den TCP-Server schickt.
+			// Nebenläufiger Thread, der UserInput aus der Console einliest und an den TCP-Server schickt.
 			// Wird nebenläufig realisiert, da "in.readLine()" in der unteren while-Schleife blockiert
 			Thread userInputThread = new Thread(() -> {
 				while(true) {
