@@ -12,15 +12,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 public class ProducerNode {
-	private final static String MESSAGE = "TextFuerQueue";
-	private final static String PRIORITY = "HIGH";
 	private final String SEND_DESTINATION = Conf.TOPIC;
 	
 	private Connection connection;
 	private Session session;
 	private MessageProducer producer;
 	
-
 	public ProducerNode() throws NamingException, JMSException {
 		Context ctx = new InitialContext();
 		ConnectionFactory factory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
@@ -29,11 +26,10 @@ public class ProducerNode {
 		Destination queue = (Destination) ctx.lookup(SEND_DESTINATION);
 		this.producer = this.session.createProducer(queue);
 	}
-
-	public void sendMessage(String text, String priority) throws JMSException {
+	
+	public void sendMessage(String text) throws JMSException {
 		TextMessage message = this.session.createTextMessage();
 		message.setText(text);
-		message.setStringProperty("Priority", priority);
 		this.producer.send(message);
 	}
 
@@ -41,7 +37,7 @@ public class ProducerNode {
 		ProducerNode node = null;
 		try {
 			node = new ProducerNode();
-			node.sendMessage(MESSAGE, PRIORITY);
+			node.sendMessage(args[0]);
 		} catch (NamingException | JMSException e) {
 			System.err.println(e);
 		} finally {

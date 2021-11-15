@@ -53,10 +53,11 @@ public class Main {
 
 	public void start() throws JMSException {
 		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-			System.out.println("EchoServer (threaded) auf " + serverSocket.getLocalSocketAddress() + " gestartet ...");
+			System.out.println("Adapter (ohne Plugins, threaded) auf " + serverSocket.getLocalSocketAddress() + " gestartet ...");
 			while (true) {
 				Socket socket = serverSocket.accept();
 				
+				// für jeden TCP-Client wird ein neuer Thread erstellt
 				ConsumerThread newThread = new ConsumerThread(socket);
 				this.threadPool.execute(newThread);				
 			}
@@ -65,6 +66,7 @@ public class Main {
 		}
 	}
 
+	// Für jede Verbindung mit einem TCP-Client wird ein neuer Thread erstellt, der gleichzeitig auch MessageConsumer und somit MessageListener im topic ist
 	private class ConsumerThread implements Runnable, MessageListener {
 
 		private final Socket socket;
@@ -104,6 +106,7 @@ public class Main {
 					messageText = "BIN";
 				}
 				
+				// Nachricht wird an den TCP-Client gesendet, gefolgt von einer Leerzeile (CR LF CR LF)
 				this.out.print(messageText);
 				this.out.print("\r\n\r\n");
 				this.out.flush();
@@ -117,12 +120,15 @@ public class Main {
 			SocketAddress socketAddress = this.socket.getRemoteSocketAddress();
 			System.out.println("Verbindung zu " + socketAddress + " aufgebaut");
 			try {
+				// Begrüßungsnachricht an den Client, damit der Client weiß, dass der Server bereit ist
 				this.out.println("Server ist bereit ...");
+				
 				String input;
 				while ((input = in.readLine()) != null) {
-					System.out.println("In die Queue reingeschrieben: " + input);
-					sendMessage(input, "low");
+					System.out.println("Neue Nachricht von " + socketAddress + " erhalten und in die Queue (" + SEND_DESTINATION + ") geschrieben: " + input);
+					sendMessage(input);
 				}
+				
 			} catch (Exception e) {
 				System.err.println(e);
 			} finally {
@@ -138,10 +144,9 @@ public class Main {
 		}
 	}
 
-	public void sendMessage(String text, String priority) throws JMSException {
+	public void sendMessage(String text) throws JMSException {
 		TextMessage message = this.session.createTextMessage();
 		message.setText(text);
-		message.setStringProperty("Priority", priority);
 		this.producer.send(message);
 	}
 

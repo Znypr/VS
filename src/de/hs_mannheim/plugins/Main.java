@@ -42,6 +42,7 @@ public class Main {
 	private MessageConsumer consumer;
 	private MessageProducer producer;
 	private Destination destIn;
+
 	
 	public Main() throws NamingException, JMSException {
 		Context ctx = new InitialContext();
@@ -58,10 +59,11 @@ public class Main {
 
 	public void start() throws JMSException {
 		try (ServerSocket serverSocket = new ServerSocket(PORT)) {
-			System.out.println("EchoServer (threaded) auf " + serverSocket.getLocalSocketAddress() + " gestartet ...");
+			System.out.println("Adapter (mit Plugins, threaded) auf " + serverSocket.getLocalSocketAddress() + " gestartet ...");
 			while (true) {
 				Socket socket = serverSocket.accept();
 				
+				// für jeden TCP-Client wird ein neuer Thread erstellt
 				ConsumerThread newThread = new ConsumerThread(socket);
 				this.threadPool.execute(newThread);				
 			}
@@ -82,8 +84,12 @@ public class Main {
 			properties.load(input);
 			String pluginName = properties.getProperty(property);
 			
-			Class<?> clazz = Class.forName(pluginName);
-			Constructor<?> constructor = clazz.getConstructor();
+			if (pluginName.equals("None")) {
+				return null;
+			}
+			
+			Class<?> pluginClass = Class.forName(pluginName);
+			Constructor<?> constructor = pluginClass.getConstructor();
 			
 			plugin = (PluginInterface) constructor.newInstance();
 		} catch (IOException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | ClassNotFoundException e) {
@@ -93,6 +99,7 @@ public class Main {
 		return plugin;
 	}
 	
+	// Für jede Verbindung mit einem TCP-Client wird ein neuer Thread erstellt, der gleichzeitig auch MessageConsumer und somit MessageListener im topic ist
 	private class ConsumerThread implements Runnable, MessageListener {
 
 		private final Socket socket;
@@ -139,6 +146,7 @@ public class Main {
 					messageText = plugin.transformString(messageText);					
 				}
 				
+				// Nachricht wird an den TCP-Client gesendet, gefolgt von einer Leerzeile (CR LF CR LF)
 				this.out.print(messageText);
 				this.out.print("\r\n\r\n");
 				this.out.flush();
@@ -152,10 +160,13 @@ public class Main {
 			SocketAddress socketAddress = this.socket.getRemoteSocketAddress();
 			System.out.println("Verbindung zu " + socketAddress + " aufgebaut");
 			try {
+				// Begrüßungsnachricht an den Client, damit der Client weiß, dass der Server bereit ist
 				this.out.println("Server ist bereit ...");
+				
 				String input;
 				while ((input = in.readLine()) != null) {
-					sendMessage(input, "low");
+					System.out.println("Neue Nachricht von " + socketAddress + " erhalten und in die Queue (" + SEND_DESTINATION + ") geschrieben: " + input);
+					sendMessage(input);
 				}
 			} catch (Exception e) {
 				System.err.println(e);
@@ -171,21 +182,16 @@ public class Main {
 			}
 		}
 	}
-
-	public void sendMessage(String text, String priority) throws JMSException {
-		
+	
+	public void sendMessage(String text) throws JMSException {
 		String message = text;
 		PluginInterface plugin = getPlugin("clientToJMSPlugin");
-		if (plugin != null) {				
+		if (plugin != null) {
 			message = plugin.transformString(text);
-		}
-		
-		
-		System.out.println("In die Queue reingeschrieben: " + message);
+		}	
 		
 		TextMessage textMessage = this.session.createTextMessage();
 		textMessage.setText(message);
-		textMessage.setStringProperty("Priority", priority);
 		this.producer.send(textMessage);
 	}
 
