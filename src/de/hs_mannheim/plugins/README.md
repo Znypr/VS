@@ -36,5 +36,3 @@ Bei diesem Plugin wird die übergebene Nachricht so transformiert, dass alle vor
 
 ## Plugin3
 Dieses Plugin dient nur dazu, um ein weiteres Plugin zur Verfügung zu haben um zu Testzwecken während der Laufzeit zwischen mehr als 2 Plugins wechseln zu können. Aus diesem Grund ersetzt dieses Plugin die übergebene Nachricht einfach durch den Text "Drittes Plugin".
-
-
