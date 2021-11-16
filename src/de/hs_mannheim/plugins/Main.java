@@ -72,6 +72,7 @@ public class Main {
 		}
 	}
 
+	// Erstellt die passende Plugin-Instanz anhand der gesetzten Property in der plugins.properties Datei
 	public PluginInterface getPlugin(String property) {
 		File file = new File("src/de/hs_mannheim/plugins/plugins.properties");
 		String propertyFilePath = file.getAbsolutePath();
@@ -135,16 +136,16 @@ public class Main {
 						messageText = "BIN";
 					} else {
 						messageText = textMessage.getText();
+						
+						// passendes Plugin laden
+						PluginInterface plugin = getPlugin("JMSToClientPlugin");
+						if (plugin != null) {
+							messageText = plugin.transformString(messageText);					
+						}
 					}
 				} else {
 					messageText = "BIN";
-				}
-				
-				PluginInterface plugin = getPlugin("JMSToClientPlugin");
-				
-				if (plugin != null) {
-					messageText = plugin.transformString(messageText);					
-				}
+				}	
 				
 				// Nachricht wird an den TCP-Client gesendet, gefolgt von einer Leerzeile (CR LF CR LF)
 				this.out.print(messageText);
@@ -165,7 +166,7 @@ public class Main {
 				
 				String input;
 				while ((input = in.readLine()) != null) {
-					System.out.println("Neue Nachricht von " + socketAddress + " erhalten und in die Queue (" + SEND_DESTINATION + ") geschrieben: " + input);
+					System.out.println("Neue Nachricht von " + socketAddress + " erhalten: " + input);
 					sendMessage(input);
 				}
 			} catch (Exception e) {
@@ -185,10 +186,14 @@ public class Main {
 	
 	public void sendMessage(String text) throws JMSException {
 		String message = text;
+		// passendes Plugin laden
 		PluginInterface plugin = getPlugin("clientToJMSPlugin");
 		if (plugin != null) {
 			message = plugin.transformString(text);
-		}	
+			System.out.println("Nachricht wurde transformiert und wird in die Queue (" + SEND_DESTINATION + ") geschrieben: " + message);
+		} else {
+			System.out.println("Nachricht wird in die Queue (" + SEND_DESTINATION + ") geschrieben: " + message);
+		}
 		
 		TextMessage textMessage = this.session.createTextMessage();
 		textMessage.setText(message);
