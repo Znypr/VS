@@ -125,7 +125,7 @@ public class Main {
 				
 				String input;
 				while ((input = in.readLine()) != null) {
-					System.out.println("Neue Nachricht von " + socketAddress + " erhalten und in die Queue (" + SEND_DESTINATION + ") geschrieben: " + input);
+					System.out.println("Neue Nachricht von " + socketAddress + " erhalten und wird in die Queue (" + SEND_DESTINATION + ") geschrieben: " + input);
 					sendMessage(input);
 				}
 				
