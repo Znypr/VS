@@ -1,6 +1,6 @@
 
-## CA-2 Plugins für JMS/Socket-Adapter
-Die Abgabe dieser Teilaufgabe besteht aus den folgenden 8 Klassen *Conf*, *Main*, *ProducerNode*, *TCPClient*, *NameList*, *Plugin1*, *Plugin2*, *Plugin3*, dem Interface *PluginInterface* und der *plugin.properties*- sowie *jndi.properties*-Datei.
+## CA-2 Plugins für JMS/Socket-Adapter von Gruppe A
+Die Abgabe dieser Teilaufgabe besteht aus den folgenden 8 Klassen *Conf*, *Main*, *ProducerNode*, *TCPClient*, *NameList*, *Plugin1*, *Plugin2*, *Plugin3*, dem Interface *PluginInterface* und der *plugin.properties*-Datei im package *de.hs_mannheim.plugins*, sowie der *jndi.properties*-Datei.
 
 Die Klassen *Conf*, *ProducerNode* und *TCPClient* haben sich zur vorherigen Teilaufgabe nicht verändert. Deren kurze Beschreibung kann in der README-Datei der letzten Teilaufgabe nachgelesen werden.
 

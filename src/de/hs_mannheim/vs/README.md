@@ -1,4 +1,4 @@
-# CA-2 JMS/Socket-Adapter
+# CA-2 JMS/Socket-Adapter von Gruppe A
 Die Abgabe dieser Teilaufgabe besteht aus den folgenden 4 Klassen *Conf*, *Main*, *ProducerNode* und *TCPClient* im package *de.hs_mannheim.vs*, sowie der *jndi.properties*-Datei.
 
 ## *Conf* und *jndi.properties*
