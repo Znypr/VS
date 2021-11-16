@@ -23,8 +23,8 @@ public class ProducerNode {
 		ConnectionFactory factory = (ConnectionFactory) ctx.lookup("ConnectionFactory");
 		this.connection = factory.createConnection();
 		this.session = this.connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Destination queue = (Destination) ctx.lookup(SEND_DESTINATION);
-		this.producer = this.session.createProducer(queue);
+		Destination topic = (Destination) ctx.lookup(SEND_DESTINATION);
+		this.producer = this.session.createProducer(topic);
 	}
 	
 	public void sendMessage(String text) throws JMSException {
@@ -37,6 +37,7 @@ public class ProducerNode {
 		ProducerNode node = null;
 		try {
 			node = new ProducerNode();
+			// Die Nachricht muss als Kommandozeilenparameter übergeben werden
 			node.sendMessage(args[0]);
 		} catch (NamingException | JMSException e) {
 			System.err.println(e);
