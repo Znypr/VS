@@ -6,6 +6,10 @@ import java.util.regex.Pattern;
 
 public class Plugin1 implements PluginInterface{
 	
+	/**
+	 * Wenn die übergebene Nachricht einen Namen aus der NameList enthält,
+	 * wird an die erste Zeile der Nachricht "Vertraulich: enthält personenbezogene Daten" angehangen
+	 */
 	@Override
 	public String transformString(String message) {
 		
@@ -16,6 +20,9 @@ public class Plugin1 implements PluginInterface{
 		ArrayList<String> names = NameList.getNames();
 		
 		for (int i = 0; i < names.size(); i++) {
+			// Pattern matcht alle alleinstehenden Namen aus der NameList.
+			// Also wenn "Jens" in der NameList vorhanden ist, wird in der Nachricht "Hier ist Jens aus dem Jenseits" 
+			// nur das erste "Jens" gematcht aber nicht das "Jens" in "Jenseits"
 			String regexPattern = "(?=\\b)" + names.get(i) + "(?=\\b)";
 			
 			Pattern pattern = Pattern.compile(regexPattern, Pattern.CASE_INSENSITIVE);
